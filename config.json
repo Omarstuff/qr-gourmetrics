@@ -1,4 +1,26 @@
 {
-  "youtube_id": "pD3AE_Edxil",
-  "whatsapp_url": "https://wa.me/5215522700110?text=Hola%2C%20me%20interesa%20saber%20c%C3%B3mo%20Gourm%C3%A9trics%20puede%20ayudarme%20a%20evitar%20rese%C3%B1as%20negativas%20en%20l%C3%ADnea."
+  "videoProvider": "vimeo",
+  "videoId": "1152694784",
+
+  "whatsappNumber": "5522700110",
+  "whatsappMessage": "Hola, me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea.",
+
+  "branding": {
+    "logo": "logo.png",
+    "logoPosition": "top",
+    "logoOpacity": 0.85
+  },
+
+  "layout": {
+    "aspectRatio": "9:16",
+    "backgroundColor": "#000000",
+    "roundedCorners": true
+  },
+
+  "cta": {
+    "enabled": true,
+    "type": "whatsapp",
+    "style": "icon",
+    "position": "bottom-right"
+  }
 }
