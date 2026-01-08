@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gourmétrics</title>
+  <style>
+    :root { --orange: #dc5c2a; --bg: #ffffff; --text: #111; }
+    html, body { height: 100%; margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background: var(--bg); color: var(--text); }
+    .wrap { min-height: 100%; display: flex; flex-direction: column; align-items: center; }
+    .frame { width: min(520px, 100%); padding: 16px; box-sizing: border-box; }
+    .playerBox {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    #player { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .floating {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      color: #111;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      border: 1px solid rgba(0,0,0,0.08);
+      backdrop-filter: blur(6px);
+    }
+    .floating:active { transform: translateY(1px); }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,0.55);
+    }
+    .card {
+      width: min(420px, 92%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .ctaBig {
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--orange);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .secondary {
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: #ededed;
+      color: #111;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 15px;
+      margin-top: 10px;
+    }
+    .brand {
+      width: min(520px, 100%);
+      padding: 14px 16px 22px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+    }
+    .brand img { width: min(340px, 90%); height: auto; }
+    .note { font-size: 12px; opacity: 0.85; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="frame">
+      <div class="playerBox">
+        <div id="player"></div>
+
+        <a id="waFloating" class="floating" href="#" target="_blank" rel="noopener">
+          WhatsApp
+        </a>
+
+        <div id="endOverlay" class="overlay" role="dialog" aria-modal="true">
+          <div class="card">
+            <div style="font-weight:900; font-size:18px;">¿Platicamos?</div>
+            <div class="note">Te abrimos WhatsApp con un mensaje listo. Puedes editarlo.</div>
+            <a id="waBig" class="ctaBig" href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+            <a id="replay" class="secondary" href="#">Reproducir otra vez</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand">
+      <img src="logo.png" alt="Gourmétrics" />
+    </div>
+  </div>
+
+  <script>
+    let CFG = null;
+    let player = null;
+
+    async function loadConfig() {
+      const r = await fetch('./config.json', { cache: 'no-store' });
+      if (!r.ok) throw new Error('No se pudo cargar config.json');
+      return await r.json();
+    }
+
+    function setLinks() {
+      document.getElementById('waFloating').href = CFG.whatsapp_url;
+      document.getElementById('waBig').href = CFG.whatsapp_url;
+    }
+
+    function showEnd() {
+      document.getElementById('endOverlay').style.display = 'flex';
+    }
+
+    function hideEnd() {
+      document.getElementById('endOverlay').style.display = 'none';
+    }
+
+    function replay(e) {
+      e.preventDefault();
+      hideEnd();
+      if (player && typeof player.seekTo === 'function') {
+        player.seekTo(0, true);
+        player.playVideo();
+      }
+    }
+
+    window.onYouTubeIframeAPIReady = function () {
+      player = new YT.Player('player', {
+        videoId: CFG.youtube_id,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          disablekb: 1
+        },
+        events: {
+          onStateChange: function (ev) {
+            if (ev.data === YT.PlayerState.ENDED) showEnd();
+          }
+        }
+      });
+    };
+
+    (async function init() {
+      CFG = await loadConfig();
+      setLinks();
+      document.getElementById('replay').addEventListener('click', replay);
+
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+    })().catch(err => {
+      console.error(err);
+      // Si falla config o YouTube, al menos deja WhatsApp visible.
+      document.getElementById('waFloating').style.display = 'inline-flex';
+    });
+  </script>
+</body>
+</html>
