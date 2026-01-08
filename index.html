@@ -18,27 +18,27 @@
       overflow: hidden;
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     }
-    #player { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #vimeoFrame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     .floating {
       position: absolute;
       right: 12px;
       bottom: 12px;
       z-index: 20;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
+      width: 48px;
+      height: 48px;
       border-radius: 999px;
       background: rgba(255,255,255,0.92);
-      color: #111;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.18);
       border: 1px solid rgba(0,0,0,0.08);
       backdrop-filter: blur(6px);
     }
+    .floating svg { width: 26px; height: 26px; }
     .floating:active { transform: translateY(1px); }
+
     .overlay {
       position: absolute;
       inset: 0;
@@ -98,10 +98,14 @@
   <div class="wrap">
     <div class="frame">
       <div class="playerBox">
-        <div id="player"></div>
+        <iframe id="vimeoFrame" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 
-        <a id="waFloating" class="floating" href="#" target="_blank" rel="noopener">
-          WhatsApp
+        <a id="waFloating" class="floating" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
+          <!-- WhatsApp icon (simple) -->
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16 3C9.4 3 4 8.2 4 14.6c0 2.4.8 4.7 2.2 6.6L5 29l7-1.9c1.8 1 3.9 1.5 6 1.5 6.6 0 12-5.2 12-11.6S22.6 3 16 3zm0 22.6c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.1 1.1 1.1-3.9-.3-.4c-1.3-1.7-2-3.7-2-5.9C4.9 9.7 9.9 5 16 5s11.1 4.7 11.1 9.6S22.1 25.6 16 25.6z"/>
+            <path d="M22.2 18.2c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.2-.8.9-1 .9-.2.1-.4.1-.7-.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.3c.2.2 2.3 3.5 5.7 4.9.8.3 1.4.5 1.9.6.8.2 1.5.2 2.1.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.3 0-.1-.2-.2-.4-.3z"/>
+          </svg>
         </a>
 
         <div id="endOverlay" class="overlay" role="dialog" aria-modal="true">
@@ -121,71 +125,54 @@
   </div>
 
   <script>
-    let CFG = null;
-    let player = null;
-
     async function loadConfig() {
       const r = await fetch('./config.json', { cache: 'no-store' });
       if (!r.ok) throw new Error('No se pudo cargar config.json');
       return await r.json();
     }
 
-    function setLinks() {
-      document.getElementById('waFloating').href = CFG.whatsapp_url;
-      document.getElementById('waBig').href = CFG.whatsapp_url;
+    function waUrlFrom(cfg) {
+      const msg = encodeURIComponent(cfg.whatsappMessage || '');
+      const num = (cfg.whatsappNumber || '').replace(/\D/g,'');
+      // MX: 521 + 10 dígitos
+      return `https://wa.me/521${num}?text=${msg}`;
     }
 
-    function showEnd() {
-      document.getElementById('endOverlay').style.display = 'flex';
+    function setLinks(cfg) {
+      const wa = waUrlFrom(cfg);
+      document.getElementById('waFloating').href = wa;
+      document.getElementById('waBig').href = wa;
     }
 
-    function hideEnd() {
-      document.getElementById('endOverlay').style.display = 'none';
-    }
+    function showEnd() { document.getElementById('endOverlay').style.display = 'flex'; }
+    function hideEnd() { document.getElementById('endOverlay').style.display = 'none'; }
 
-    function replay(e) {
-      e.preventDefault();
-      hideEnd();
-      if (player && typeof player.seekTo === 'function') {
-        player.seekTo(0, true);
-        player.playVideo();
-      }
+    function setVimeo(cfg) {
+      const id = cfg.videoId;
+      // controles/título/byline/portrait off, autoplay on, loop off
+      const src = `https://player.vimeo.com/video/${id}?autoplay=1&muted=0&loop=0&title=0&byline=0&portrait=0&controls=0&transparent=0&dnt=1`;
+      document.getElementById('vimeoFrame').src = src;
     }
-
-    window.onYouTubeIframeAPIReady = function () {
-      player = new YT.Player('player', {
-        videoId: CFG.youtube_id,
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1,
-          fs: 0,
-          iv_load_policy: 3,
-          disablekb: 1
-        },
-        events: {
-          onStateChange: function (ev) {
-            if (ev.data === YT.PlayerState.ENDED) showEnd();
-          }
-        }
-      });
-    };
 
     (async function init() {
-      CFG = await loadConfig();
-      setLinks();
-      document.getElementById('replay').addEventListener('click', replay);
+      const cfg = await loadConfig();
+      setLinks(cfg);
+      setVimeo(cfg);
 
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-    })().catch(err => {
-      console.error(err);
-      // Si falla config o YouTube, al menos deja WhatsApp visible.
-      document.getElementById('waFloating').style.display = 'inline-flex';
-    });
+      // Replay: recargar iframe para reiniciar
+      document.getElementById('replay').addEventListener('click', (e) => {
+        e.preventDefault();
+        hideEnd();
+        const f = document.getElementById('vimeoFrame');
+        const cur = f.src;
+        f.src = cur; // reload
+      });
+
+      // Evento "ended": Vimeo en iframe no lo notifica sin su API.
+      // Workaround simple: si quieres overlay al final, lo mejor es activar loop=0 y
+      // poner tu CTA grande siempre visible o usar la API de Vimeo (más complejo).
+      // Por ahora dejamos solo el CTA flotante (ya está) y el overlay queda manual.
+    })().catch(err => console.error(err));
   </script>
 </body>
 </html>
