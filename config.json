@@ -1,26 +1,7 @@
 {
   "videoProvider": "vimeo",
   "videoId": "1152694784",
-
+  "vimeoHash": "02942e4a9d",
   "whatsappNumber": "5522700110",
-  "whatsappMessage": "Hola, me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea.",
-
-  "branding": {
-    "logo": "logo.png",
-    "logoPosition": "top",
-    "logoOpacity": 0.85
-  },
-
-  "layout": {
-    "aspectRatio": "9:16",
-    "backgroundColor": "#000000",
-    "roundedCorners": true
-  },
-
-  "cta": {
-    "enabled": true,
-    "type": "whatsapp",
-    "style": "icon",
-    "position": "bottom-right"
-  }
+  "whatsappMessage": "Hola, me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea."
 }
