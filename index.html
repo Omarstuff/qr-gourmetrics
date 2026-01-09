@@ -25,14 +25,13 @@
     .video-wrapper{ position:absolute; inset:0; background:#000; }
     .video-wrapper iframe{ width:100%; height:100%; border:none; }
 
-    /* Logo fijo */
+    /* Logo fijo (esquina superior izquierda, ~60% del tamaño anterior) */
     .brand{
       position:absolute;
-      top:14px;
-      left:50%;
-      transform:translateX(-50%);
-      width:240px;
-      max-width:78%;
+      top:12px;
+      left:12px;
+      width:144px;          /* 60% de 240px */
+      max-width:60%;
       z-index:32;
       pointer-events:none;
       filter: drop-shadow(0 6px 16px rgba(0,0,0,.35));
@@ -195,8 +194,17 @@
   const waMessage = "Hola, me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea.";
   const waUrl = `https://wa.me/521${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
-  waBtn.href = waUrl;
-  waBig.href = waUrl;
+  const videoEl = document.getElementById("video");
+  const waBtnEl = document.getElementById("waBtn");
+  const waBigEl = document.getElementById("waBig");
+  const soundBtn = document.getElementById("soundBtn");
+  const ppBtn = document.getElementById("ppBtn");
+  const ppIcon = document.getElementById("ppIcon");
+  const overlayEl = document.getElementById("endOverlay");
+  const replayBtn = document.getElementById("replayBtn");
+
+  waBtnEl.href = waUrl;
+  waBigEl.href = waUrl;
 
   // Create Vimeo iframe
   const iframe = document.createElement("iframe");
@@ -210,27 +218,53 @@
     `&dnt=1`;
   iframe.allow = "autoplay; fullscreen; picture-in-picture";
   iframe.setAttribute("allowfullscreen", "");
-  video.appendChild(iframe);
+  videoEl.appendChild(iframe);
 
   const player = new Vimeo.Player(iframe);
 
-  const soundBtn = document.getElementById("soundBtn");
-  const ppBtn = document.getElementById("ppBtn");
-  const ppIcon = document.getElementById("ppIcon");
-
+  // Overlay helpers (y ocultar/mostrar botón pausa)
   let overlayShown = false;
+  let endWatcher = null;
 
   function showOverlay(){
     if (overlayShown) return;
     overlayShown = true;
-    endOverlay.classList.add("show");
+    overlayEl.classList.add("show");
     ppBtn.classList.add("hidden"); // ocultar pausa con overlay
   }
 
   function hideOverlay(){
-    endOverlay.classList.remove("show");
+    overlayEl.classList.remove("show");
     ppBtn.classList.remove("hidden");
     overlayShown = false;
+  }
+
+  // Watcher robusto: NO depende de 'ended' (por si no se dispara en algún navegador)
+  async function startEndWatcher(){
+    stopEndWatcher();
+
+    endWatcher = setInterval(async () => {
+      if (overlayShown) return;
+
+      try {
+        const d = await player.getDuration();
+        const t = await player.getCurrentTime();
+
+        // margen amplio para no "perder" el final por granularidad
+        if (d && t >= (d - 0.9)) {
+          showOverlay();
+        }
+      } catch (e) {
+        // si falla, no hacemos nada y se intentará en el siguiente tick
+      }
+    }, 250);
+  }
+
+  function stopEndWatcher(){
+    if (endWatcher) {
+      clearInterval(endWatcher);
+      endWatcher = null;
+    }
   }
 
   // Audio
@@ -246,7 +280,7 @@
   soundBtn.addEventListener("click", enableAudio);
 
   // Tocar video = intentar habilitar audio (solo si no está overlay)
-  video.addEventListener("click", () => {
+  videoEl.addEventListener("click", () => {
     if (!overlayShown && !soundBtn.classList.contains("fade-out")) enableAudio();
   });
 
@@ -271,23 +305,26 @@
     }
   });
 
+  // Mantener icono sincronizado
   player.on("pause", () => { if (!overlayShown) setIconPlay(); });
-  player.on("play", () => { if (!overlayShown) setIconPause(); });
-
-  // Mostrar overlay "casi al final" para que se vea el último frame detrás
-  player.on("timeupdate", (data) => {
-    if (!overlayShown && data && data.duration && data.seconds >= (data.duration - 0.25)) {
-      showOverlay();
-    }
+  player.on("play", () => {
+    if (!overlayShown) setIconPause();
+    startEndWatcher();
   });
 
-  // Backup por si ended se dispara
-  player.on("ended", showOverlay);
+  // Backup: ended (siempre que dispare)
+  player.on("ended", () => {
+    showOverlay();
+  });
+
+  // Iniciar watcher pronto (por si autoplay no dispara 'play' en algún caso)
+  startEndWatcher();
 
   // Replay
   replayBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     hideOverlay();
+
     try {
       await player.setMuted(true);
       soundBtn.classList.remove("fade-out");
@@ -296,6 +333,7 @@
       await player.play();
 
       setIconPause();
+      startEndWatcher();
     } catch (err) {
       console.error(err);
     }
