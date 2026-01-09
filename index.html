@@ -6,112 +6,168 @@
   <title>Gourmetrics</title>
 
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #ffffff;
-      height: 100%;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+    html, body { margin:0; padding:0; background:#fff; height:100%; font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif; }
+    .page { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:24px; box-sizing:border-box; }
 
-    .page {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    .phone{
+      width:360px; height:640px; background:#111; border-radius:28px; overflow:hidden; position:relative;
+      box-shadow:0 20px 50px rgba(0,0,0,.35);
     }
+    .video-wrapper{ position:absolute; inset:0; background:#000; }
+    .video-wrapper iframe{ width:100%; height:100%; border:none; }
 
-    .phone {
-      width: 360px;
-      height: 640px;
-      background: #111;
-      border-radius: 28px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    .wa-btn{
+      position:absolute; bottom:16px; right:16px; width:52px; height:52px; background:#25D366; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,.35);
+      text-decoration:none; z-index:30;
     }
+    .wa-btn svg{ width:28px; height:28px; fill:#fff; }
 
-    .video-wrapper {
-      position: absolute;
-      inset: 0;
-      background: #000;
+    .sound-btn{
+      position:absolute; bottom:16px; left:16px;
+      padding:10px 12px; border-radius:999px; border:none;
+      background:rgba(255,255,255,.92); color:#111; font-weight:800; font-size:14px;
+      display:flex; align-items:center; gap:8px;
+      box-shadow:0 8px 20px rgba(0,0,0,.35);
+      z-index:30; cursor:pointer;
     }
+    .sound-btn:active{ transform: translateY(1px); }
+    .sound-btn svg{ width:18px; height:18px; fill:#111; }
 
-    .video-wrapper iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .overlay{
+      position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(0,0,0,.55); z-index:40; padding:18px; box-sizing:border-box;
     }
-
-    .wa-btn {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      width: 52px;
-      height: 52px;
-      background: #25D366;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,.35);
-      text-decoration: none;
-      z-index: 10;
+    .card{
+      width:100%; max-width:320px;
+      background:#fff; border-radius:18px; padding:18px; text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
     }
-
-    .wa-btn img {
-      width: 28px;
-      height: 28px;
+    .title{ font-weight:900; font-size:18px; }
+    .note{ font-size:12px; opacity:.85; margin-top:8px; line-height:1.35; }
+    .ctaBig{
+      display:inline-block; width:100%; box-sizing:border-box;
+      padding:14px 16px; border-radius:14px; background:#dc5c2a; color:#fff;
+      text-decoration:none; font-weight:900; font-size:16px; margin-top:12px;
+    }
+    .secondary{
+      display:inline-block; width:100%; box-sizing:border-box;
+      padding:12px 16px; border-radius:14px; background:#ededed; color:#111;
+      text-decoration:none; font-weight:900; font-size:15px; margin-top:10px;
     }
   </style>
 </head>
 
 <body>
-
 <div class="page">
   <div class="phone">
-
     <div class="video-wrapper" id="video"></div>
 
-    <a
-      class="wa-btn"
-      href="https://wa.me/5522700110?text=Hola%2C%20me%20interesa%20conocer%20cómo%20Gourmétrics%20me%20puede%20ayudar."
-      target="_blank"
-      aria-label="WhatsApp"
-    >
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
-        alt="WhatsApp"
-      />
+    <button class="sound-btn" id="soundBtn" type="button" aria-label="Activar audio">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a3.5 3.5 0 0 0-1.5-2.87v5.74A3.5 3.5 0 0 0 16.5 12zm0-7.5v2.06A7 7 0 0 1 19 12a7 7 0 0 1-2.5 5.44v2.06A9 9 0 0 0 21 12a9 9 0 0 0-4.5-7.5z"/>
+      </svg>
+      Activar audio
+    </button>
+
+    <a class="wa-btn" id="waBtn" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 3C9.4 3 4 8.2 4 14.6c0 2.4.8 4.7 2.2 6.6L5 29l7-1.9c1.8 1 3.9 1.5 6 1.5 6.6 0 12-5.2 12-11.6S22.6 3 16 3zm0 22.6c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.1 1.1 1.1-3.9-.3-.4c-1.3-1.7-2-3.7-2-5.9C4.9 9.7 9.9 5 16 5s11.1 4.7 11.1 9.6S22.1 25.6 16 25.6z"/>
+        <path d="M22.2 18.2c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.2-.8.9-1 .9-.2.1-.4.1-.7-.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.3c.2.2 2.3 3.5 5.7 4.9.8.3 1.4.5 1.9.6.8.2 1.5.2 2.1.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.3 0-.1-.2-.2-.4-.3z"/>
+      </svg>
     </a>
 
+    <div class="overlay" id="endOverlay" role="dialog" aria-modal="true">
+      <div class="card">
+        <div class="title">¿Platicamos?</div>
+        <div class="note">Te abrimos WhatsApp con un mensaje listo. Puedes editarlo antes de enviar.</div>
+        <a class="ctaBig" id="waBig" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+        <a class="secondary" href="#" id="replayBtn">Reproducir otra vez</a>
+      </div>
+    </div>
   </div>
 </div>
 
+<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
+  // Vimeo
   const vimeoId = "1152694784";
   const vimeoHash = "02942e4a9d";
 
+  // WhatsApp
+  const waNumber = "5522700110";
+  const waMessage = "Hola, me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea.";
+  const waUrl = `https://wa.me/521${waNumber}?text=${encodeURIComponent(waMessage)}`;
+
+  document.getElementById("waBtn").href = waUrl;
+  document.getElementById("waBig").href = waUrl;
+
+  // Create Vimeo iframe
   const iframe = document.createElement("iframe");
   iframe.src =
     `https://player.vimeo.com/video/${vimeoId}` +
-    `?h=${vimeoHash}` +
+    `?h=${encodeURIComponent(vimeoHash)}` +
     `&autoplay=1` +
-    `&muted=0` +
+    `&muted=1` +              // autoplay requires muted
     `&loop=0` +
-    `&title=0` +
-    `&byline=0` +
-    `&portrait=0` +
-    `&controls=0` +
+    `&title=0&byline=0&portrait=0&controls=0` +
     `&dnt=1`;
-
-  iframe.allow =
-    "autoplay; fullscreen; picture-in-picture; encrypted-media";
-
-  iframe.allowFullscreen = true;
-
+  iframe.allow = "autoplay; fullscreen; picture-in-picture";
+  iframe.setAttribute("allowfullscreen", "");
   document.getElementById("video").appendChild(iframe);
-</script>
 
+  const player = new Vimeo.Player(iframe);
+
+  const soundBtn = document.getElementById("soundBtn");
+  const overlay = document.getElementById("endOverlay");
+  const replayBtn = document.getElementById("replayBtn");
+
+  function showOverlay(){ overlay.style.display = "flex"; }
+  function hideOverlay(){ overlay.style.display = "none"; }
+
+  async function enableAudio() {
+    try {
+      await player.setVolume(1);
+      await player.setMuted(false);
+      soundBtn.style.display = "none";
+    } catch (e) {
+      soundBtn.textContent = "Toca para activar audio";
+    }
+  }
+
+  soundBtn.addEventListener("click", enableAudio);
+
+  // If user taps the video area, also try enabling audio
+  document.getElementById("video").addEventListener("click", () => {
+    if (soundBtn.style.display !== "none") enableAudio();
+  });
+
+  // Detect end of video
+  player.on('ended', () => {
+    showOverlay();
+  });
+
+  // Replay
+  replayBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    hideOverlay();
+    try {
+      // For replay we reset to start, keep muted autoplay behavior:
+      await player.setMuted(true);
+      soundBtn.style.display = "flex";
+      soundBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a3.5 3.5 0 0 0-1.5-2.87v5.74A3.5 3.5 0 0 0 16.5 12zm0-7.5v2.06A7 7 0 0 1 19 12a7 7 0 0 1-2.5 5.44v2.06A9 9 0 0 0 21 12a9 9 0 0 0-4.5-7.5z"/>
+        </svg>
+        Activar audio
+      `;
+      await player.setCurrentTime(0);
+      await player.play();
+    } catch (err) {
+      // If play is blocked, user can tap video or the audio button
+      console.error(err);
+    }
+  });
+</script>
 </body>
 </html>
