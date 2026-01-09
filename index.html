@@ -16,7 +16,6 @@
     .video-wrapper{ position:absolute; inset:0; background:#000; }
     .video-wrapper iframe{ width:100%; height:100%; border:none; }
 
-    /* Logo fijo (esquina superior izquierda, ~60% del tamaño anterior) */
     .brand{
       position:absolute; top:12px; left:12px;
       width:144px; max-width:60%;
@@ -28,21 +27,17 @@
     .wa-btn{
       position:absolute; bottom:16px; right:16px; width:52px; height:52px; background:#25D366; border-radius:50%;
       display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,.35);
-      text-decoration:none; z-index:30; transition: transform .15s ease;
+      text-decoration:none; z-index:30;
     }
-    .wa-btn:active{ transform: scale(.96); }
-    .wa-btn svg{ width:28px; height:28px; fill:#fff; }
 
     .sound-btn{
       position:absolute; bottom:16px; left:16px;
       padding:10px 12px; border-radius:999px; border:none;
       background:rgba(255,255,255,.92); color:#111; font-weight:800; font-size:14px;
-      display:flex; align-items:center; gap:8px; box-shadow:0 8px 20px rgba(0,0,0,.35);
-      z-index:30; cursor:pointer; transition: opacity .25s ease, transform .15s ease;
+      display:flex; align-items:center; gap:8px;
+      box-shadow:0 8px 20px rgba(0,0,0,.35);
+      z-index:30; cursor:pointer;
     }
-    .sound-btn.fade-out{ opacity:0; pointer-events:none; }
-    .sound-btn:active{ transform: translateY(1px); }
-    .sound-btn svg{ width:18px; height:18px; fill:#111; }
 
     .pp-btn{
       position:absolute; left:50%; bottom:16px; transform:translateX(-50%);
@@ -50,19 +45,13 @@
       background:rgba(255,255,255,.92);
       display:flex; align-items:center; justify-content:center;
       box-shadow:0 8px 20px rgba(0,0,0,.35);
-      z-index:30; cursor:pointer; transition: transform .15s ease, opacity .25s ease;
+      z-index:30; cursor:pointer;
     }
-    .pp-btn:active{ transform:translateX(-50%) scale(.96); }
-    .pp-btn svg{ width:22px; height:22px; fill:#111; }
     .pp-btn.hidden{ opacity:0; pointer-events:none; }
 
-    /* Overlay final: NO tapar el último frame.
-       - oscurecemos MUY poco
-       - blur leve (si el navegador lo soporta)
-    */
     .overlay{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,.18); /* antes .55; esto era lo que “mataba” el último cuadro */
+      background:rgba(0,0,0,.18);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
       z-index:40; padding:18px; box-sizing:border-box;
@@ -74,26 +63,23 @@
       width:100%; max-width:320px;
       background:#fff; border-radius:18px; padding:18px; text-align:center;
       box-shadow:0 10px 30px rgba(0,0,0,.35);
-      transform: translateY(12px); transition: transform .3s ease;
     }
-    .overlay.show .card{ transform: translateY(0); }
 
-    .title{ font-weight:900; font-size:18px; }
-    .note{ font-size:12px; opacity:.85; margin-top:8px; line-height:1.35; }
+    .title{ font-weight:900; font-size:16px; }
     .ctaBig{
-      display:inline-block; width:100%; box-sizing:border-box;
-      padding:14px 16px; border-radius:14px; background:#dc5c2a; color:#fff;
-      text-decoration:none; font-weight:900; font-size:16px; margin-top:12px;
-      transition: transform .15s ease;
+      display:inline-block; width:100%;
+      padding:14px 16px; border-radius:14px;
+      background:#dc5c2a; color:#fff;
+      text-decoration:none; font-weight:900; font-size:16px;
+      margin-top:14px;
     }
-    .ctaBig:active{ transform: scale(.97); }
     .secondary{
-      display:inline-block; width:100%; box-sizing:border-box;
-      padding:12px 16px; border-radius:14px; background:#ededed; color:#111;
-      text-decoration:none; font-weight:900; font-size:15px; margin-top:10px;
-      transition: transform .15s ease;
+      display:inline-block; width:100%;
+      padding:12px 16px; border-radius:14px;
+      background:#ededed; color:#111;
+      text-decoration:none; font-weight:900; font-size:15px;
+      margin-top:10px;
     }
-    .secondary:active{ transform: scale(.97); }
   </style>
 </head>
 
@@ -104,31 +90,17 @@
 
     <img class="brand" src="logo.png" alt="Gourmetrics" />
 
-    <button class="sound-btn" id="soundBtn" type="button" aria-label="Activar audio">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 10v4h4l5 4V6L7 10H3zm13.5 2a3.5 3.5 0 0 0-1.5-2.87v5.74A3.5 3.5 0 0 0 16.5 12zm0-7.5v2.06A7 7 0 0 1 19 12a7 7 0 0 1-2.5 5.44v2.06A9 9 0 0 0 21 12a9 9 0 0 0-4.5-7.5z"/>
-      </svg>
-      Activar audio
-    </button>
+    <button class="sound-btn" id="soundBtn">Activar audio</button>
+    <button class="pp-btn" id="ppBtn">❚❚</button>
 
-    <button class="pp-btn" id="ppBtn" type="button" aria-label="Pausar">
-      <svg viewBox="0 0 24 24" aria-hidden="true" id="ppIcon">
-        <path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"></path>
-      </svg>
-    </button>
+    <a class="wa-btn" id="waBtn" target="_blank"></a>
 
-    <a class="wa-btn" id="waBtn" target="_blank" rel="noopener" aria-label="WhatsApp">
-      <svg viewBox="0 0 32 32" aria-hidden="true">
-        <path d="M16 3C9.4 3 4 8.2 4 14.6c0 2.4.8 4.7 2.2 6.6L5 29l7-1.9c1.8 1 3.9 1.5 6 1.5 6.6 0 12-5.2 12-11.6S22.6 3 16 3zm0 22.6c-1.9 0-3.8-.5-5.4-1.5l-.4-.2-4.1 1.1 1.1-3.9-.3-.4c-1.3-1.7-2-3.7-2-5.9C4.9 9.7 9.9 5 16 5s11.1 4.7 11.1 9.6S22.1 25.6 16 25.6z"/>
-        <path d="M22.2 18.2c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.2-.8.9-1 .9-.2.1-.4.1-.7-.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.6c.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.7s1.2 3.1 1.4 3.3c.2.2 2.3 3.5 5.7 4.9.8.3 1.4.5 1.9.6.8.2 1.5.2 2.1.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.1.2-1.3 0-.1-.2-.2-.4-.3z"/>
-      </svg>
-    </a>
-
-    <div class="overlay" id="endOverlay" role="dialog" aria-modal="true">
+    <div class="overlay" id="endOverlay">
       <div class="card">
-        <div class="title">¿Platicamos?</div>
-        <div class="note">Te abrimos WhatsApp con un mensaje listo. Puedes editarlo antes de enviar.</div>
-        <a class="ctaBig" id="waBig" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+        <div class="title">
+          ¿Quieres evitar que una mala experiencia en tu restaurante termine como una reseña negativa en línea?
+        </div>
+        <a class="ctaBig" id="waBig" target="_blank">Escríbenos por WhatsApp</a>
         <a class="secondary" href="#" id="replayBtn">Reproducir otra vez</a>
       </div>
     </div>
@@ -137,186 +109,57 @@
 
 <script src="https://player.vimeo.com/api/player.js"></script>
 <script>
-  // Vimeo
   const vimeoId = "1152694784";
   const vimeoHash = "02942e4a9d";
-
-  // (Tu video dura 59s; usamos esto como fallback sólido)
   const KNOWN_DURATION_SECONDS = 59;
 
-  // Para “congelar” el último frame antes de mostrar overlay:
-  const FREEZE_BEFORE_END_SECONDS = 0.08;  // qué tan cerca del final nos quedamos
-  const TRIGGER_BEFORE_END_SECONDS = 0.25; // cuándo disparamos la secuencia (antes del final real)
-
-  // WhatsApp
   const waNumber = "5522700110";
-  const waMessage = "Hola, me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea.";
+  const waMessage = "Hola. Me interesa conocer cómo Gourmétrics me puede ayudar a evitar reseñas negativas en línea.";
   const waUrl = `https://wa.me/521${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
-  const videoEl   = document.getElementById("video");
-  const waBtnEl   = document.getElementById("waBtn");
-  const waBigEl   = document.getElementById("waBig");
-  const soundBtn  = document.getElementById("soundBtn");
-  const ppBtn     = document.getElementById("ppBtn");
-  const ppIcon    = document.getElementById("ppIcon");
-  const overlayEl = document.getElementById("endOverlay");
-  const replayBtn = document.getElementById("replayBtn");
+  waBtn.href = waUrl;
+  waBig.href = waUrl;
 
-  waBtnEl.href = waUrl;
-  waBigEl.href = waUrl;
-
-  // Create Vimeo iframe
   const iframe = document.createElement("iframe");
   iframe.src =
-    `https://player.vimeo.com/video/${vimeoId}` +
-    `?h=${encodeURIComponent(vimeoHash)}` +
-    `&autoplay=1&muted=1&loop=0` +
-    `&title=0&byline=0&portrait=0&controls=0&dnt=1`;
-  iframe.allow = "autoplay; fullscreen; picture-in-picture";
-  iframe.setAttribute("allowfullscreen", "");
-  videoEl.appendChild(iframe);
+    `https://player.vimeo.com/video/${vimeoId}?h=${vimeoHash}&autoplay=1&muted=1&controls=0`;
+  iframe.allow = "autoplay";
+  video.appendChild(iframe);
 
   const player = new Vimeo.Player(iframe);
 
   let overlayShown = false;
-  let poll = null;
-  let cachedDuration = null;
-
-  function setIconPause(){
-    ppBtn.setAttribute("aria-label", "Pausar");
-    ppIcon.innerHTML = '<path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"></path>';
-  }
-  function setIconPlay(){
-    ppBtn.setAttribute("aria-label", "Continuar");
-    ppIcon.innerHTML = '<path d="M8 5v14l11-7L8 5z"></path>';
-  }
-
-  function showOverlayUI(){
-    overlayEl.classList.add("show");
-    ppBtn.classList.add("hidden");
-  }
-  function hideOverlayUI(){
-    overlayEl.classList.remove("show");
-    ppBtn.classList.remove("hidden");
-  }
-
-  async function resolveDurationOnce(){
-    if (cachedDuration) return cachedDuration;
-    try {
-      const d = await player.getDuration();
-      if (d && d > 0) cachedDuration = d;
-    } catch (e) {}
-    if (!cachedDuration) cachedDuration = KNOWN_DURATION_SECONDS;
-    return cachedDuration;
-  }
-
-  // Secuencia: congelar último frame y luego mostrar overlay
-  async function freezeAndShowOverlay(){
+  setInterval(async () => {
     if (overlayShown) return;
-    overlayShown = true;
-
     try {
-      const d = await resolveDurationOnce();
-      const freezeAt = Math.max(0, d - FREEZE_BEFORE_END_SECONDS);
+      const t = await player.getCurrentTime();
+      if (t >= KNOWN_DURATION_SECONDS - 0.2) {
+        overlayShown = true;
+        endOverlay.classList.add("show");
+        ppBtn.classList.add("hidden");
+      }
+    } catch {}
+  }, 300);
 
-      // Importante: mover a casi-el-final y pausar para que NO se vaya a negro/fin
-      await player.setCurrentTime(freezeAt);
-      await player.pause();
-    } catch (e) {
-      // si algo falla, igual mostramos overlay
-    }
-
-    showOverlayUI();
-  }
-
-  // Poll: disparamos ANTES del final real para alcanzar a congelar el frame
-  function startPoll(){
-    stopPoll();
-    poll = setInterval(async () => {
-      if (overlayShown) return;
-
-      try {
-        const d = await resolveDurationOnce();
-        const t = await player.getCurrentTime();
-
-        if (t >= (d - TRIGGER_BEFORE_END_SECONDS)) {
-          await freezeAndShowOverlay();
-        }
-      } catch (e) {}
-    }, 250);
-  }
-
-  function stopPoll(){
-    if (poll) { clearInterval(poll); poll = null; }
-  }
-
-  // Audio
-  async function enableAudio(){
-    try {
-      await player.setVolume(1);
-      await player.setMuted(false);
-      soundBtn.classList.add("fade-out");
-    } catch (e) {
-      soundBtn.textContent = "Toca para activar audio";
-    }
-  }
-  soundBtn.addEventListener("click", enableAudio);
-  videoEl.addEventListener("click", () => {
-    if (!overlayShown && !soundBtn.classList.contains("fade-out")) enableAudio();
-  });
-
-  // Pausa / Continuar
-  ppBtn.addEventListener("click", async () => {
-    const paused = await player.getPaused();
-    if (paused) {
-      await player.play();
-      setIconPause();
-    } else {
-      await player.pause();
-      setIconPlay();
-    }
-  });
-
-  // Eventos
-  player.on("play", async () => {
-    if (!overlayShown) setIconPause();
-    await resolveDurationOnce();
-    startPoll();
-  });
-
-  player.on("pause", async () => {
-    if (!overlayShown) setIconPlay();
-  });
-
-  // Backup: ended. Ojo: en algunos casos Vimeo cambia a negro al “ended”.
-  // Por eso aquí también congelamos.
-  player.on("ended", () => {
-    freezeAndShowOverlay();
-  });
-
-  // Arranque
-  resolveDurationOnce().then(startPoll);
-
-  // Replay
-  replayBtn.addEventListener("click", async (e) => {
+  replayBtn.onclick = async e => {
     e.preventDefault();
-
-    hideOverlayUI();
     overlayShown = false;
+    endOverlay.classList.remove("show");
+    ppBtn.classList.remove("hidden");
+    await player.setMuted(true);
+    await player.setCurrentTime(0);
+    await player.play();
+  };
 
-    try {
-      await player.setMuted(true);
-      soundBtn.classList.remove("fade-out");
+  soundBtn.onclick = async () => {
+    await player.setMuted(false);
+    soundBtn.style.display = "none";
+  };
 
-      await player.setCurrentTime(0);
-      await player.play();
-
-      setIconPause();
-      startPoll();
-    } catch (err) {
-      console.error(err);
-    }
-  });
+  ppBtn.onclick = async () => {
+    const paused = await player.getPaused();
+    paused ? player.play() : player.pause();
+  };
 </script>
 </body>
 </html>
