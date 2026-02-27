@@ -25,10 +25,12 @@
     }
 
     .wa-btn{
-      position:absolute; bottom:16px; right:16px; width:52px; height:52px; background:#25D366; border-radius:50%;
-      display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,.35);
+      position:absolute; bottom:16px; right:16px; width:52px; height:52px;
+      background:transparent; border-radius:0;
+      display:flex; align-items:center; justify-content:center;
       text-decoration:none; z-index:30;
     }
+    .wa-btn svg{ width:34px; height:34px; display:block; }
 
     .sound-btn{
       position:absolute; bottom:16px; left:16px;
@@ -67,14 +69,14 @@
 
     .title{ font-weight:900; font-size:16px; }
     .ctaBig{
-      display:inline-block; width:100%;
+      display:block; width:100%; box-sizing:border-box;
       padding:14px 16px; border-radius:14px;
       background:#dc5c2a; color:#fff;
       text-decoration:none; font-weight:900; font-size:16px;
       margin-top:14px;
     }
     .secondary{
-      display:inline-block; width:100%;
+      display:block; width:100%; box-sizing:border-box;
       padding:12px 16px; border-radius:14px;
       background:#ededed; color:#111;
       text-decoration:none; font-weight:900; font-size:15px;
@@ -87,13 +89,10 @@
 <div class="page">
   <div class="phone">
     <div class="video-wrapper" id="video"></div>
-
-    <img class="brand" src="logo.png" alt="Gourmetrics" />
-
-    <button class="sound-btn" id="soundBtn">Activar audio</button>
+<button class="sound-btn" id="soundBtn">Activar audio</button>
     <button class="pp-btn" id="ppBtn">❚❚</button>
 
-    <a class="wa-btn" id="waBtn" target="_blank"></a>
+    <a class="wa-btn" id="waBtn" target="_blank" aria-label="WhatsApp"><svg viewBox="0 0 32 32" role="img" aria-hidden="true"><path d="M19.11 17.17c-.27-.14-1.62-.8-1.87-.89-.25-.09-.43-.14-.61.14-.18.27-.7.89-.86 1.07-.16.18-.32.2-.59.07-.27-.14-1.15-.42-2.19-1.35-.81-.72-1.36-1.61-1.52-1.88-.16-.27-.02-.42.12-.55.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.48-.84-2.03-.22-.53-.45-.46-.61-.47h-.52c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.27 0 1.34.98 2.64 1.11 2.82.14.18 1.93 2.95 4.67 4.13.65.28 1.16.45 1.56.57.66.21 1.27.18 1.75.11.53-.08 1.62-.66 1.85-1.3.23-.64.23-1.18.16-1.3-.07-.12-.25-.2-.52-.34z"/><path d="M26.67 5.33A12.93 12.93 0 0 0 16.02 0C8.84 0 3.01 5.83 3.01 13.01c0 2.29.6 4.53 1.73 6.5L3 32l12.75-1.67a12.94 12.94 0 0 0 6.27 1.6h.01c7.18 0 13.01-5.83 13.01-13.01 0-3.47-1.35-6.73-3.37-8.58zM16.03 29.1h-.01c-2.05 0-4.06-.55-5.83-1.6l-.42-.25-7.57.99.99-7.38-.27-.43a10.78 10.78 0 0 1-1.65-5.73c0-5.98 4.87-10.84 10.86-10.84 2.9 0 5.62 1.13 7.68 3.18a10.78 10.78 0 0 1 3.17 7.66c0 5.98-4.87 10.84-10.95 10.84z"/></svg></a>
 
     <div class="overlay" id="endOverlay">
       <div class="card">
@@ -128,6 +127,9 @@
 
   const player = new Vimeo.Player(iframe);
 
+  // Tracks whether the user has explicitly enabled audio at least once
+  let userUnmuted = false;
+
   let overlayShown = false;
   setInterval(async () => {
     if (overlayShown) return;
@@ -146,12 +148,23 @@
     overlayShown = false;
     endOverlay.classList.remove("show");
     ppBtn.classList.remove("hidden");
-    await player.setMuted(true);
+
+    // If the user had enabled audio before, keep audio on for the replay.
+    // Otherwise, start muted and show the "Activar audio" button again.
+    if (userUnmuted) {
+      await player.setMuted(false);
+      soundBtn.style.display = "none";
+    } else {
+      await player.setMuted(true);
+      soundBtn.style.display = "flex";
+    }
+
     await player.setCurrentTime(0);
     await player.play();
   };
 
   soundBtn.onclick = async () => {
+    userUnmuted = true;
     await player.setMuted(false);
     soundBtn.style.display = "none";
   };
