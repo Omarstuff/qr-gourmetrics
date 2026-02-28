@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Gourmetrics</title>
 
   <style>
@@ -11,8 +11,8 @@
 
     .phone{
       width:100vw;
-      height:100dvh;
-      height:100vh; /* fallback */
+      height:var(--app-height, 100svh);
+      min-height:100svh;
       background:#111;
       border-radius:0;
       overflow:hidden;
@@ -22,7 +22,16 @@
 
     /* On larger screens, keep a "phone" look */
     @media (min-width: 700px){
-      .page{ align-items:center; padding:24px; }
+      .page{
+      display:flex;
+      justify-content:center;
+      align-items:stretch;
+      height:var(--app-height, 100svh);
+      min-height:100svh;
+      padding:0;
+      box-sizing:border-box;
+      background:#fff;
+    }
       .phone{ width:360px; height:640px; border-radius:28px; box-shadow:0 20px 50px rgba(0,0,0,.35); }
     }
     .video-wrapper{ position:absolute; inset:0; background:#000; }
@@ -118,6 +127,22 @@
 
 <script src="https://player.vimeo.com/api/player.js"></script>
 <script>
+  // Keeps the layout inside the *actually visible* viewport (iOS/Android, Safari/Chrome, in-app browsers)
+  const setAppViewport = () => {
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", `${Math.round(h)}px`);
+  };
+  window.addEventListener("resize", setAppViewport);
+  window.addEventListener("orientationchange", setAppViewport);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", setAppViewport);
+    window.visualViewport.addEventListener("scroll", setAppViewport);
+  }
+  setAppViewport();
+
+
+
   const vimeoId = "1168706988";
   const vimeoHash = "0b8073971c";
   const KNOWN_DURATION_SECONDS = 65;
