@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gourmetrics</title>
 
   <style>
@@ -10,50 +10,11 @@
     .page { display:flex; justify-content:center; align-items:center; min-height:100vh; padding:24px; box-sizing:border-box; }
 
     .phone{
-      width:100vw;
-      height:var(--app-height, 100svh);
-      min-height:100svh;
-      background:#111;
-      padding-top:var(--vv-top, 0px);
-      padding-bottom:var(--vv-bottom, 0px);
-      box-sizing:border-box;
-      border-radius:0;
-      overflow:hidden;
-      position:relative;
-      box-shadow:none;
+      width:360px; height:640px; background:#111; border-radius:28px; overflow:hidden; position:relative;
+      box-shadow:0 20px 50px rgba(0,0,0,.35);
     }
-
-    /* On larger screens, keep a "phone" look */
-    @media (min-width: 700px){
-      .page{
-      display:flex;
-      justify-content:center;
-      align-items:stretch;
-      height:var(--app-height, 100svh);
-      min-height:100svh;
-      padding:0;
-      box-sizing:border-box;
-      background:#fff;
-    }
-      .phone{ width:360px; height:640px; border-radius:28px; box-shadow:0 20px 50px rgba(0,0,0,.35); }
-    }
-    .video-wrapper{ position:absolute; inset:0; background:#000; overflow:hidden; }
-    .video-wrapper iframe{
-      position:absolute;
-      left:50%;
-      bottom:0;
-      transform:translateX(-50%);
-      border:none;
-    }
-
-    /* Cover behavior without distorting: fill container, may crop (prefers cropping from top) */
-    @media (orientation: portrait){
-      .video-wrapper iframe{ height:100%; width:auto; min-width:100%; }
-    }
-    @media (orientation: landscape){
-      .video-wrapper iframe{ width:100%; height:auto; min-height:100%; }
-    }
-    }
+    .video-wrapper{ position:absolute; inset:0; background:#000; }
+    .video-wrapper iframe{ width:100%; height:100%; border:none; }
 
     .brand{
       position:absolute; top:12px; left:12px;
@@ -64,9 +25,7 @@
     }
 
     .sound-btn{
-      position:absolute;
-      bottom:calc(16px + env(safe-area-inset-bottom) + var(--vv-bottom, 0px));
-      left:calc(16px + env(safe-area-inset-left));
+      position:absolute; bottom:16px; left:16px;
       padding:10px 12px; border-radius:999px; border:none;
       background:rgba(255,255,255,.92); color:#111; font-weight:800; font-size:14px;
       display:flex; align-items:center; gap:8px;
@@ -75,10 +34,7 @@
     }
 
     .pp-btn{
-      position:absolute;
-      left:50%;
-      bottom:calc(16px + env(safe-area-inset-bottom) + var(--vv-bottom, 0px));
-      transform:translateX(-50%);
+      position:absolute; left:50%; bottom:16px; transform:translateX(-50%);
       width:52px; height:52px; border:none; border-radius:50%;
       background:rgba(255,255,255,.92);
       display:flex; align-items:center; justify-content:center;
@@ -93,8 +49,7 @@
       background:rgba(0,0,0,.18);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
-      z-index:40;
-      padding:18px 18px calc(40px + env(safe-area-inset-bottom) + var(--vv-bottom, 0px)) 18px;
+      z-index:40; padding:18px 18px 40px 18px;
       box-sizing:border-box;
       opacity:0; pointer-events:none; transition: opacity .3s ease;
     }
@@ -145,34 +100,6 @@
 
 <script src="https://player.vimeo.com/api/player.js"></script>
 <script>
-  // Keeps the layout inside the *actually visible* viewport (iOS/Android, Safari/Chrome, in-app browsers)
-  const setAppViewport = () => {
-    const vv = window.visualViewport;
-    const h = vv ? vv.height : window.innerHeight;
-    const top = vv ? vv.offsetTop : 0;
-    const bottom = vv ? Math.max(0, window.innerHeight - (vv.height + vv.offsetTop)) : 0;
-
-    // Extra cushion for iOS browsers where the bottom toolbar can overlay content without affecting innerHeight/visualViewport.
-    const ua = navigator.userAgent || "";
-    const isiOS = /iPhone|iPad|iPod/i.test(ua);
-    const isStandalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || (navigator.standalone === true);
-    const iosToolbarCushion = (isiOS && !isStandalone) ? 84 : 0; // px
-
-    const chromeBottom = Math.max(bottom, iosToolbarCushion);
-    document.documentElement.style.setProperty("--app-height", `${Math.round(h)}px`);
-    document.documentElement.style.setProperty("--vv-top", `${Math.round(top)}px`);
-    document.documentElement.style.setProperty("--vv-bottom", `${Math.round(chromeBottom)}px`);
-  };
-  window.addEventListener("resize", setAppViewport);
-  window.addEventListener("orientationchange", setAppViewport);
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", setAppViewport);
-    window.visualViewport.addEventListener("scroll", setAppViewport);
-  }
-  setAppViewport();
-
-
-
   const vimeoId = "1168706988";
   const vimeoHash = "0b8073971c";
   const KNOWN_DURATION_SECONDS = 65;
